@@ -69,9 +69,8 @@ def insert_data(conn, data):
     cur.execute(insert_sql, data)
     conn.commit()
 
-def show():
-    st.write("SHM AST checker")
-    st.markdown("---")
+def main():
+    st.header("SHM AST checker", divider='violet')
 
     # Connect to the database and fetch property addresses and IDs
     conn = create_connection()
@@ -133,6 +132,9 @@ def show():
             st.error(f"An error occurred: {e}")
 
         conn.close()
+
+if __name__ == "__main__":
+    main()
 
 
 
