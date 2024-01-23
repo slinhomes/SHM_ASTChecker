@@ -106,7 +106,7 @@ def main():
         "Comment": comments
     }
 
-    preview_df = pd.Dataframe([data]).set_index('Dwelling_ID')
+    preview_df = pd.DataFrame([data]).set_index('Dwelling_ID')
     st.data_editor(preview_df,
                    column_config = {
                        "Dwelling_ID": st.column_config.TextColumn("Dwelling ID"),
