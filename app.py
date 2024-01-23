@@ -61,13 +61,39 @@ def create_table(conn):
         print(e)
 
 # Function to insert data 
-def insert_data(conn, data):
-    insert_sql = '''INSERT INTO SHMASTCheck (Dwelling_ID, Academic_Year, Checked_by, Comment)
-                   VALUES (?, ?, ?, ?);'''
+# def insert_data(conn, data):
+#     insert_sql = '''INSERT INTO SHMASTCheck (Dwelling_ID, Academic_Year, Checked_by, Comment)
+#                    VALUES (?, ?, ?, ?);'''
 
-    cur = conn.cursor()
-    cur.execute(insert_sql, data)
-    conn.commit()
+#     cur = conn.cursor()
+#     cur.execute(insert_sql, data)
+#     conn.commit()
+
+# Function to insert or update data
+def upsert_data(conn, data):
+    try:
+        # Check if a record with the same Dwelling_ID and Academic_Year exists
+        check_sql = '''SELECT COUNT(*) FROM SHMASTCheck WHERE Dwelling_ID = ? AND Academic_Year = ?;'''
+        cur = conn.cursor()
+        cur.execute(check_sql, (data[0], data[1]))
+        count = cur.fetchone()[0]
+
+        if count > 0:
+            # Update the existing record
+            update_sql = '''UPDATE SHMASTCheck 
+                            SET Checked_by = ?, Comment = ?
+                            WHERE Dwelling_ID = ? AND Academic_Year = ?;'''
+            cur.execute(update_sql, (data[2], data[3], data[0], data[1]))
+        else:
+            # Insert a new record
+            insert_sql = '''INSERT INTO SHMASTCheck (Dwelling_ID, Academic_Year, Checked_by, Comment)
+                            VALUES (?, ?, ?, ?);'''
+            cur.execute(insert_sql, data)
+
+        conn.commit()
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
 
 def main():
     st.header("SHM AST checker", divider='violet')
@@ -117,6 +143,7 @@ def main():
                    disabled = ["Dwelling_ID","Academic_Year","Checked_By","Comment"])
 
     submit_button = st.button("Submit")
+
     if submit_button:
         data_tuple = (
             dwelling_id, ay, checked_by, comments
@@ -126,7 +153,7 @@ def main():
         create_table(conn)
 
         try:
-            insert_data(conn, data_tuple)
+            upsert_data(conn, data_tuple)
             st.success("Data submitted successfully!")
         except Exception as e:
             st.error(f"An error occurred: {e}")
