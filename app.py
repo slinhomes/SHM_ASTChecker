@@ -120,7 +120,7 @@ def main():
     ay = st.selectbox("Academic year", ["2023", "2024", "2025", "2026"])
 
     # Dropdown for selecting a requirements or condition
-    checked_by = st.selectbox("AST checked by", ['MG','FR','GB'])
+    checked_by = st.selectbox("AST checked by", ['MG','FR','GB','SL','SS','JC'])
 
     # Text input for comments
     comments = st.text_area("Comments for AST", placeholder="Please add in any comments you'd like to leave against the AST", height=100)
