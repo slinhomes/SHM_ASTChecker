@@ -30,9 +30,10 @@ def check_password():
 if not check_password():
     st.stop()  # Do not continue if check_password is not True.
 
-import streamlit as st
+#import streamlit as st
 import pyodbc
 import pandas as pd
+import io import StringIO
 
 # Function to connect to the Azure SQL database
 def create_connection():
@@ -93,6 +94,12 @@ def upsert_data(conn, data):
         conn.commit()
     except Exception as e:
         print(f"An error occurred: {e}")
+
+def upsert_data_batch(conn, df):
+    cursor = conn.cursor()
+    for _,row in df.iterrows():
+        upsert_data(conn, (row['Dwelling_ID'],row['Academic_Year'],row['Checked_By'],row['Comment']))
+    conn.commit()
 
 
 def main():
@@ -160,6 +167,30 @@ def main():
             st.error(f"An error occurred: {e}")
 
         conn.close()
+
+    st.subheader("Bulk submission")
+    uploaded_file = st.file_uploader("Upload a CSV file for bulk submission.", type=['csv'])
+    if uploaded_file is not None:
+        stringio = StringIO(uploaded_file.getvalue().decode("utf-8"))
+        stringio.seek(0)
+        uploaded_df = pd.read_csv(stringio)
+
+        st.write("Preview of uploaded data (fist 5 rows):")
+        st.write(uploaded_df.head())
+
+        submit_batch_button = st.button("Submit CSV")
+        if submit_batch_button:
+            try:
+                conn = create_connection()
+                create_table(conn)
+                upsert_data_batch(conn, uploaded_df)
+                st.success("Bulk submission successful!")
+            except Exception as e:
+                st.error(f"An error occured during the submission: {e}")
+            finally:
+                conn.close()
+                
+    
 
 if __name__ == "__main__":
     main()
