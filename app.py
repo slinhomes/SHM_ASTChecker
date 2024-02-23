@@ -123,6 +123,7 @@ def main():
     checked_by = st.selectbox("AST checked by", ['MG','FR','GB','SL','SS','JC','Other - please your initial in the comments'])
 
     # Text input for comments
+    # Refresh
     comments = st.text_area("Comments for AST", placeholder="Please add in any comments you'd like to leave against the AST", height=100)
 
     data = {
