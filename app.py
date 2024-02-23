@@ -33,7 +33,7 @@ if not check_password():
 #import streamlit as st
 import pyodbc
 import pandas as pd
-import io import StringIO
+from io import StringIO
 
 # Function to connect to the Azure SQL database
 def create_connection():
@@ -189,7 +189,7 @@ def main():
                 st.error(f"An error occured during the submission: {e}")
             finally:
                 conn.close()
-                
+
     
 
 if __name__ == "__main__":
